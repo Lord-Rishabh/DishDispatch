@@ -10,7 +10,7 @@ const adminSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    fullName: {
+    name: {
       type: String,
       required: true,
     },
@@ -29,5 +29,4 @@ const adminSchema = new mongoose.Schema({
 
 const Admin = mongoose.model('Admin', adminSchema);
 
-// Export the Admin model
 module.exports = Admin;
