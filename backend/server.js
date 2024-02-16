@@ -2,6 +2,9 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const connectToMongo = require('./db');
+
+connectToMongo();
 const PORT = 3000;
 
 app.listen(PORT, () => {
