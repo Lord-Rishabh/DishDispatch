@@ -27,5 +27,8 @@ const dishSchema = new mongoose.Schema({
   },
 });
 
+// Create the Dish model using the schema
 const Dish = mongoose.model('Dish', dishSchema);
+
+// Export the Dish model
 module.exports = Dish;
