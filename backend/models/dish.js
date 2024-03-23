@@ -5,6 +5,11 @@ const dishSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  dish_id: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   description: {
     type: String,
     required: true,

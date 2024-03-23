@@ -2,12 +2,24 @@ const mongoose = require('mongoose');
 
 // Define the schema for an order
 const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  orderId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  customerName: {
+    type: String,
     required: true,
   },
-  items: [
+  phoneNumber: {
+    type: String,
+    required: true,
+  },
+  tableNumber: {
+    type: Number,
+    required: true,
+  },
+  orderItems: [
     {
       dish: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,11 +35,6 @@ const orderSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-  },
-  status: {
-    type: String,
-    enum: ['Pending', 'Processing', 'Delivered'],
-    default: 'Pending',
   },
   time: {
     type: Date,
