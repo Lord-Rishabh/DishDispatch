@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Dish = require('./dish'); // Import the Dish model/schema
-const authenticateJWT = require('./middleware/middleware.js'); // Import the middleware
+const authenticateJWT = require('../middleware/middleware.js'); // Import the middleware
 
 // Route to create a new dish
 router.post('/dishes', authenticateJWT, async (req, res) => {
@@ -20,19 +20,6 @@ router.get('/dishes', async (req, res) => {
   try {
     const dishes = await Dish.find();
     res.json(dishes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Route to get a single dish by ID
-router.get('/dishes/:id', async (req, res) => {
-  try {
-    const dish = await Dish.findById(req.params.id);
-    if (!dish) {
-      return res.status(404).json({ message: 'Dish not found' });
-    }
-    res.json(dish);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
