@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 
 // Define the schema for an order
 const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: String,
-    required: true,
-    unique: true
-  },
   customerName: {
     type: String,
     required: true,

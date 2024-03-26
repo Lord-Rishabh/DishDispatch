@@ -25,6 +25,7 @@ app.get('/login', (req, res) => {
 //Available Routes 
 app.use('/api/dish', require('./routes/dish'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/order', require('./routes/order'));
 
 app.listen(PORT, () => {
   console.log("Server is running on port 3000");
