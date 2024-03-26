@@ -4,6 +4,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Homepage from "./pages/Homepage";
+import Login from "./pages/loginPage";
+import Register from "./pages/signupPage";
 
 const App = () => {
   return (
@@ -12,5 +14,19 @@ const App = () => {
     </>
   )
 }
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Homepage />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+]);
 
-export default App
+export default router;
