@@ -16,7 +16,6 @@ router.post('/', async (req, res) => {
       price,
       time
     });
-    console.log(newOrder);
 
     // Save the new order to the database
     const createdOrder = await newOrder.save();

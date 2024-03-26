@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "git-push": "git add . && git commit -m 'commited changes' && git push -u origin main",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
