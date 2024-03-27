@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const jwtMiddleware = require('../middleware/middleware.js');
+const loginMiddleware = require('../middleware/middleware');
 const User = require('../models/user');
 
 router.post('/register', async (req, res) => {
@@ -38,31 +38,9 @@ router.post('/register', async (req, res) => {
 });
 
 // Login user and generate JWT token
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    // Find the user by username
-    const user = await User.findOne({ username });
-
-    // Check if the user exists
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Check if the password is correct
-    if (!password) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate a JWT token
-    const token = signToken({ userId: user._id });
-    res.json({ token });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+router.post('/login', loginMiddleware, (req, res) => {
+  // If the execution reaches here, it means the user is authenticated
+  res.json({ message: 'Login successful', user: req.user });
 });
 
 module.exports = router;

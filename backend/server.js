@@ -7,8 +7,10 @@ connectToMongo();
 const PORT = 3000;
 app.use(express.json());
 const authRoutes = require('./routes/auth');
+const cors = require('cors')
 
 app.use('/auth', authRoutes);
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Homepage')
