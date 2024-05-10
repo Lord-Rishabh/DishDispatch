@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const dishSchema = new mongoose.Schema({
+  dish_id: {
+    type: String,
+    unique: true, // Ensure uniqueness of dish_id
+    required: true,
+    default: uuidv4 // Use UUID v4 to generate a unique identifier
+  },
   name: {
     type: String,
     required: true,

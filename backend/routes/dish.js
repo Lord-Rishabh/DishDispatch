@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Dish = require('../models/Dish');
+const fetchuser = require('../middleware/middleware');
 
 // Route to get all dishes from a particular restaurantUsername
-router.get('/restaurant/:restaurantUsername/dishes', async (req, res) => {
+router.get('/:restaurantUsername/dishes', async (req, res) => {
   try {
     const { restaurantUsername } = req.params;
     const dishes = await Dish.find({ restaurantUsername });
@@ -15,7 +16,7 @@ router.get('/restaurant/:restaurantUsername/dishes', async (req, res) => {
 });
 
 // Route to get a particular dish of a restaurant
-router.get('/restaurant/:restaurantUsername/dishes/:dishId', async (req, res) => {
+router.get('/:restaurantUsername/dishes/:dishId', async (req, res) => {
   try {
     const { restaurantUsername, dishId } = req.params;
     const dish = await Dish.findOne({ _id: dishId, restaurantUsername });
@@ -30,7 +31,7 @@ router.get('/restaurant/:restaurantUsername/dishes/:dishId', async (req, res) =>
 });
 
 // Route to post a new dish to a particular restaurant
-router.post('/restaurant/:restaurantUsername/dishes', async (req, res) => {
+router.post('/:restaurantUsername/dishes', fetchuser , async (req, res) => {
   try {
     const { name, description, category, price, image_url } = req.body;
     const { restaurantUsername } = req.params;
@@ -51,7 +52,7 @@ router.post('/restaurant/:restaurantUsername/dishes', async (req, res) => {
 });
 
 // Route to update a dish of a particular restaurant
-router.put('/restaurant/:restaurantUsername/dishes/:dishId', async (req, res) => {
+router.put('/:restaurantUsername/dishes/:dishId', async (req, res) => {
   try {
     const { name, description, category, price, image_url } = req.body;
     const { restaurantUsername, dishId } = req.params;
@@ -71,7 +72,7 @@ router.put('/restaurant/:restaurantUsername/dishes/:dishId', async (req, res) =>
 });
 
 // Route to delete a dish of a particular restaurant
-router.delete('/restaurant/:restaurantUsername/dishes/:dishId', async (req, res) => {
+router.delete('/:restaurantUsername/dishes/:dishId', async (req, res) => {
   try {
     const { restaurantUsername, dishId } = req.params;
     const dish = await Dish.findOneAndDelete({ _id: dishId, restaurantUsername });
