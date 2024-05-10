@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const loginMiddleware = require('../middleware/middleware');
+const loginMiddleware = require('../middleware/loginMiddleware');
 const User = require('../models/user');
 
 router.post('/register', async (req, res) => {

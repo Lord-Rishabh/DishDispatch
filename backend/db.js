@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const url = process.env.mongoUrl;
 
 const connectToMongo = ()=>{
     try {
-        mongoose.connect(url)
+        console.log(" &^& " + process.env.url);
+        mongoose.connect(process.env.url)
         console.log("Connected to Mongo Successfully");
     }
     catch {

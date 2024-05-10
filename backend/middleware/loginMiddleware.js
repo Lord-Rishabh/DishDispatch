@@ -1,5 +1,8 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/user'); // Assuming you have a User model
+const jwt = require('jsonwebtoken');
+const secretKey = 'your-secret-key';
+const User = require('../models/user'); 
+
 
 // Middleware function to handle login
 const loginMiddleware = async (req, res, next) => {
@@ -24,6 +27,9 @@ const loginMiddleware = async (req, res, next) => {
 
     // If password matches, set user information in request object and proceed
     req.user = user;
+    // Create a JWT token
+    const token = jwt.sign({ userId: user._id, email: user.email }, secretKey);
+    console.log('Token:', token);
     next();
   } catch (error) {
     console.error('Login error:', error);
