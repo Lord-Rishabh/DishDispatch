@@ -52,9 +52,13 @@ router.post('/:restaurantUsername/dishes', fetchuser , async (req, res) => {
 });
 
 // Route to update a dish of a particular restaurant
-router.put('/:restaurantUsername/dishes/:dishId', async (req, res) => {
+router.put('/:restaurantUsername/dishes/:dishId', fetchuser , async (req, res) => {
   try {
     const { name, description, category, price, image_url } = req.body;
+    
+    if(!name || !description || !category || !price)
+      return res.status(404).json({ msg: 'Please fill all the details' });
+    
     const { restaurantUsername, dishId } = req.params;
     let dish = await Dish.findOneAndUpdate(
       { _id: dishId, restaurantUsername },
@@ -72,7 +76,7 @@ router.put('/:restaurantUsername/dishes/:dishId', async (req, res) => {
 });
 
 // Route to delete a dish of a particular restaurant
-router.delete('/:restaurantUsername/dishes/:dishId', async (req, res) => {
+router.delete('/:restaurantUsername/dishes/:dishId', fetchuser , async (req, res) => {
   try {
     const { restaurantUsername, dishId } = req.params;
     const dish = await Dish.findOneAndDelete({ _id: dishId, restaurantUsername });
