@@ -5,10 +5,9 @@ const dishSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  dish_id: {
-    type: Number,
+  restaurantUsername: {
+    type: String,
     required: true,
-    unique: true,
   },
   description: {
     type: String,
@@ -24,7 +23,6 @@ const dishSchema = new mongoose.Schema({
   },
   image_url: {
     type: String,
-    required: true,
   },
   created_at: {
     type: Date,
