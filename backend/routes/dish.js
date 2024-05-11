@@ -19,7 +19,7 @@ router.get('/:restaurantUsername/dishes', async (req, res) => {
 router.get('/:restaurantUsername/dishes/:dishId', async (req, res) => {
   try {
     const { restaurantUsername, dishId } = req.params;
-    const dish = await Dish.findOne({ _id: dishId, restaurantUsername });
+    const dish = await Dish.find({ _id: dishId, restaurantUsername });
     if (!dish) {
       return res.status(404).json({ msg: 'Dish not found' });
     }

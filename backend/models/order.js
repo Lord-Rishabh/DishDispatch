@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 // Define the schema for an order
 const orderSchema = new mongoose.Schema({
+  restaurantUsername: {
+    type: String,
+    required: true,
+  },
   customerName: {
     type: String,
     required: true,
@@ -27,13 +31,13 @@ const orderSchema = new mongoose.Schema({
       },
     },
   ],
-  price: {
-    type: Number,
-    required: true,
-  },
   time: {
     type: Date,
     default: Date.now,
+  },
+  status : {
+    type: Boolean, 
+    default: false
   },
 });
 
