@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
 
     // Save the user to the database
     await newUser.save();
-
+    console.log('User registered successfully');
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error(error);
@@ -41,6 +41,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', loginMiddleware, (req, res) => {
   // If the execution reaches here, it means the user is authenticated
   res.json({ message: 'Login successful', user: req.user });
+  console.log('Login successful');
 });
 
 module.exports = router;
