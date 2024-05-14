@@ -4,6 +4,7 @@ import Navbar from '../components/Header';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = formData._id ? `http://localhost:3000/api/dish/rishabh/dishes/${formData._id}` : 'http://localhost:3000/api/dish/rishabh/dishes';
+      const url = formData._id ? `http://localhost:3000/api/dish/${user}/dishes/${formData._id}` : `http://localhost:3000/api/dish/${user}/dishes`;
       const method = formData._id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -66,7 +67,7 @@ const Dashboard = () => {
 
   const deleteDish = async (dishId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/dish/rishabh/dishes/${dishId}`, {
+      const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes/${dishId}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -80,26 +81,51 @@ const Dashboard = () => {
       console.error('Error:', error);
     }
   };
+  const fetchUser = async () => { 
+    const token = localStorage.getItem('token');
+    if (token) {
+      const response = await fetch('http://localhost:3000/api/auth/userDetails', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': token
+        },
+      });
+      const json = await response.json();
+      setUser(json.username);
+    } else {
+      navigate('/login');
+    }
+  };
 
   const fetchData = async () => {
     const token = localStorage.getItem('token');
+    fetchUser();
     if (token) {
-      const response = await fetch('http://localhost:3000/api/dish/rishabh/dishes', {
+      const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
       const json = await response.json();
+
       setDishes(json);
     } else {
       navigate('/login');
     }
   };
 
+  
   useEffect(() => {
-    fetchData();
+    fetchUser();
   }, []);
+  
+  useEffect(() => {
+    if (user) {
+      fetchData(); // Fetch dishes after user state is updated
+    }
+  }, [user]);
 
   return (
     <div>

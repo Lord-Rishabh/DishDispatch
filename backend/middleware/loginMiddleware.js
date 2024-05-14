@@ -28,7 +28,7 @@ const loginMiddleware = async (req, res, next) => {
     // If password matches, set user information in request object and proceed
     req.user = user;
     // Create a JWT token
-    const token = jwt.sign({ userId: user._id, username: user.username, email: user.email }, secretKey);
+    const token = jwt.sign({ userId: user._id, username: user.username, name: user.name, email: user.email }, secretKey);
     res.json({token})
     console.log('Token:', token);
     next();

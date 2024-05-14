@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { Link } from "react-router-dom";
 import Navbar from '../components/Header';
+import { useNavigate } from 'react-router-dom';
 
 const signupPage = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const signupPage = () => {
     email: '',
     password: ''
   });
-
+  let navigate = useNavigate();
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
@@ -26,13 +27,16 @@ const signupPage = () => {
         },
         body: JSON.stringify(formData)
       });
-
+      console.log(response);
+      const json = await response.json();
+      console.log(json);
       if (response.ok) {
         // Success - do something here, like showing a success message
         console.log('User registered successfully!');
+        navigate('/dashboard');
       } else {
         // Handle errors - maybe show an error message
-        console.error('Registration failed.');
+        console.error(json.message);
       }
     } catch (error) {
       console.error('Error:', error);
