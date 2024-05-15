@@ -7,6 +7,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [categorizedMenu, setCategorizedMenu] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -14,6 +15,24 @@ const Dashboard = () => {
     price: '',
     image_url: ''
   });
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const toggleCategory = (category) => {
+    setExpandedCategories(prevState => ({
+      ...prevState,
+      [category]: !prevState[category]
+    }));
+  };
+
+  const categorizedByCategory = (dishes) => {
+    const menu = {};
+    dishes.forEach((dish) => {
+      if (!menu[dish.category])
+        menu[dish.category] = [];
+      menu[dish.category].push(dish);
+    });
+    console.log(menu);
+    setCategorizedMenu(menu);
+  }
 
   const toggleForm = (dishDetails = null) => {
     setIsFormOpen(!isFormOpen);
@@ -59,7 +78,7 @@ const Dashboard = () => {
         price: '',
         image_url: ''
       });
-      fetchData();
+      fetchDishes();
     } catch (error) {
       console.error('Error:', error);
     }
@@ -76,12 +95,12 @@ const Dashboard = () => {
       });
       const json = await response.json();
       console.log(json);
-      fetchData();
+      fetchDishes();
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  const fetchUser = async () => { 
+  const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
       const response = await fetch('http://localhost:3000/api/auth/userDetails', {
@@ -92,13 +111,14 @@ const Dashboard = () => {
         },
       });
       const json = await response.json();
+
       setUser(json.username);
     } else {
       navigate('/login');
     }
   };
 
-  const fetchData = async () => {
+  const fetchDishes = async () => {
     const token = localStorage.getItem('token');
     fetchUser();
     if (token) {
@@ -109,21 +129,21 @@ const Dashboard = () => {
         },
       });
       const json = await response.json();
-
+      categorizedByCategory(json);
       setDishes(json);
     } else {
       navigate('/login');
     }
   };
 
-  
+
   useEffect(() => {
     fetchUser();
   }, []);
-  
+
   useEffect(() => {
     if (user) {
-      fetchData(); // Fetch dishes after user state is updated
+      fetchDishes(); // Fetch dishes after user state is updated
     }
   }, [user]);
 
@@ -138,6 +158,16 @@ const Dashboard = () => {
           >
             Add Dish
           </button>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 ml-4"
+            onClick={() => navigate('/orders')}
+          >
+            View Orders
+          </button>
+
+
+
+
           {isFormOpen && (
             <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
               <form onSubmit={handleSubmit} className="bg-white p-8 rounded-md shadow-lg">
@@ -214,34 +244,49 @@ const Dashboard = () => {
             </div>
           )}
           <div className="grid grid-cols-3 gap-4">
-            {dishes.map((dish) => (
-              <div key={dish._id} className="text-xl p-5 px-12 border border-gray-300 rounded">
-                <h1>{dish.name}</h1>
-                <p>{dish.description}</p>
-                <p>{dish.category}</p>
-                <p>{dish.price}</p>
-                <img src={dish.image_url} alt={dish.name} />
-                <div>
+            
+            {/* new menu */}
+            <div>
+              {Object.entries(categorizedMenu).map(([category, dishes]) => (
+                <div key={category} className="mb-8">
                   <button
-                    className="bg-blue-500 mr-3 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => deleteDish(dish._id)}
+                    onClick={() => toggleCategory(category)}
+                    className="flex items-center justify-between w-full py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none focus:bg-gray-300"
                   >
-                    Delete Dish
+                    <span className="text-lg font-semibold">{category}</span>
+                    <span>{expandedCategories[category] ? '-' : '+'}</span>
                   </button>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => toggleForm(dish)}
-                  >
-                    Update Dish
-                  </button>
+                  {expandedCategories[category] && (
+                    <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {dishes.map((dish) => (
+                        <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden">
+                          <div className="flex bg-gray-100 p-4">
+                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+                            <div>
+                              <h1 className="text-xl font-semibold">{dish.name}</h1>
+                              <p className="text-gray-600">{dish.description}</p>
+                              <p className="text-gray-600">Category: {dish.category}</p>
+                              <p className="text-gray-600">Price: {dish.price}</p>
+                            </div>
+                          </div>
+                          <div className="flex justify-center py-2">
+                            <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded mr-2">Delete Dish</button>
+                            <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">Update Dish</button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {/* new menu ends here */}
+
           </div>
         </div>
       </div>
     </div>
-    
+
   );
 };
 
