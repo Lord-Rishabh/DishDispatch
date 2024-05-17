@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Menu = () => {
-    const { restaurantName } = useParams();
+    const navigate = useNavigate();
+    const { restaurantName, tableNumber } = useParams();
     const [dishes, setDishes] = useState([]);
     const [filteredDishes, setFilteredDishes] = useState([]);
     const [expandedCategories, setExpandedCategories] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
+    const [cart, setCart] = useState({});
 
     const toggleCategory = (category) => {
         setExpandedCategories(prevState => ({
@@ -43,21 +46,55 @@ const Menu = () => {
             return;
         }
 
+        // reduce function will iterate over each category and filter dishes based on query
+        // dishes is not an array, it is an object with category as key and dishes as value array that's why we are using Object.entries
         const filtered = Object.entries(dishes).reduce((acc, [category, dishes]) => {
-            const filteredCategoryDishes = dishes.filter(dish =>
+            const filteredDishes = dishes.filter(dish =>
                 dish.name.toLowerCase().includes(query.toLowerCase()) ||
                 dish.description.toLowerCase().includes(query.toLowerCase()) ||
                 dish.category.toLowerCase().includes(query.toLowerCase()) ||
                 dish.price.toString().includes(query)
             );
-
-            if (filteredCategoryDishes.length) {
-                acc[category] = filteredCategoryDishes;
-            }
+            if (filteredDishes.length)
+                acc[category] = filteredDishes;
             return acc;
-        }, {});
+        }, {})
 
         setFilteredDishes(filtered);
+    };
+
+    const handleAddToCart = (dish) => {
+        setCart(prevCart => {
+            const newCart = { ...prevCart };
+            newCart[dish._id] = (newCart[dish._id] || 0) + 1;
+            return newCart;
+        });
+        console.log(cart);
+    };
+
+    const handleIncrement = (dishId) => {
+        setCart(prevCart => ({
+            ...prevCart,
+            [dishId]: prevCart[dishId] + 1
+        }));
+        console.log(cart);
+    };
+
+    const handleDecrement = (dishId) => {
+        setCart(prevCart => {
+            const newCart = { ...prevCart };
+            if (newCart[dishId] > 1) {
+                newCart[dishId] -= 1;
+            } else {
+                delete newCart[dishId];
+            }
+            return newCart;
+        });
+        console.log(cart);
+    };
+
+    const handleCart = () => {
+        navigate(`/cart/${restaurantName}/${tableNumber}`, { state: { cart } });
     };
 
     useEffect(() => {
@@ -70,23 +107,23 @@ const Menu = () => {
 
     return (
         <div>
-
             {/* Navbar */}
             <div className="flex justify-center mt-8">
                 <div className="bg-gray-300 shadow-md rounded-full px-8 py-3 flex items-center space-x-4 w-3/4 max-w-4xl">
-                    
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-gray-100 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-gray-100 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
                 </div>
+                    <button onClick={() => handleCart()} className="bg-indigo-500 text-white text-lg rounded-xl ml-12 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
+                        Cart
+                    </button>
             </div>
             {/* Navbar ends here */}
 
-            
             {/* Menu */}
             <div className="container mx-auto p-4">
                 {Object.entries(filteredDishes).map(([category, dishes]) => (
@@ -116,12 +153,30 @@ const Menu = () => {
                                             </div>
                                         </div>
                                         <div className="p-4 bg-gray-100">
-                                            <button
-                                                // onClick={() => handleAddToCart(dish)}
-                                                className="py-2 px-4 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                                            >
-                                                Add to Cart
-                                            </button>
+                                            {cart[dish._id] ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => handleDecrement(dish._id)}
+                                                        className="py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="text-lg">{cart[dish._id]}</span>
+                                                    <button
+                                                        onClick={() => handleIncrement(dish._id)}
+                                                        className="py-1 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleAddToCart(dish)}
+                                                    className="py-2 px-4 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                            )}
                                         </div>
                                     </li>
                                 ))}
@@ -130,11 +185,9 @@ const Menu = () => {
                     </div>
                 ))}
             </div>
-            {/* new menu ends here */}
-
+            {/* Menu ends here */}
         </div>
-
-    )
-}
+    );
+};
 
 export default Menu
