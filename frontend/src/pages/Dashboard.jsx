@@ -5,9 +5,8 @@ import Navbar from '../components/Header';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [dishes, setDishes] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [categorizedMenu, setCategorizedMenu] = useState([]);
+  const [dishes, setDishes] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -31,7 +30,7 @@ const Dashboard = () => {
       menu[dish.category].push(dish);
     });
     console.log(menu);
-    setCategorizedMenu(menu);
+    setDishes(menu);
   }
 
   const toggleForm = (dishDetails = null) => {
@@ -130,7 +129,6 @@ const Dashboard = () => {
       });
       const json = await response.json();
       categorizedByCategory(json);
-      setDishes(json);
     } else {
       navigate('/login');
     }
@@ -164,8 +162,6 @@ const Dashboard = () => {
           >
             View Orders
           </button>
-
-
 
 
           {isFormOpen && (
@@ -243,46 +239,48 @@ const Dashboard = () => {
               </form>
             </div>
           )}
-          <div className="grid grid-cols-3 gap-4">
-            
-            {/* new menu */}
-            <div>
-              {Object.entries(categorizedMenu).map(([category, dishes]) => (
-                <div key={category} className="mb-8">
-                  <button
-                    onClick={() => toggleCategory(category)}
-                    className="flex items-center justify-between w-full py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-300 focus:outline-none focus:bg-gray-300"
-                  >
-                    <span className="text-lg font-semibold">{category}</span>
-                    <span>{expandedCategories[category] ? '-' : '+'}</span>
-                  </button>
-                  {expandedCategories[category] && (
-                    <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {dishes.map((dish) => (
-                        <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden">
-                          <div className="flex bg-gray-100 p-4">
-                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+
+          {/* new menu */}
+          <div className="container mx-auto p-4">
+            {Object.entries(dishes).map(([category, dishes]) => (
+              <div key={category} className="mb-12">
+                <button
+                  onClick={() => toggleCategory(category)}
+                  className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                >
+                  <span className="text-xl font-semibold">{category}</span>
+                  <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
+                </button>
+                {expandedCategories[category] && (
+                  <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {dishes.map((dish) => (
+                      <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex p-4 bg-white">
+                          <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+                          <div className="flex flex-col justify-between">
                             <div>
-                              <h1 className="text-xl font-semibold">{dish.name}</h1>
-                              <p className="text-gray-600">{dish.description}</p>
-                              <p className="text-gray-600">Category: {dish.category}</p>
-                              <p className="text-gray-600">Price: {dish.price}</p>
+                              <h2 className="text-lg font-semibold">{dish.name}</h2>
+                              <p className="text-gray-600 mt-1">{dish.description}</p>
+                            </div>
+                            <div className="mt-2 text-sm text-gray-500">
+                              <p>Category: {dish.category}</p>
+                              <p>Price: {dish.price}</p>
                             </div>
                           </div>
-                          <div className="flex justify-center py-2">
-                            <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded mr-2">Delete Dish</button>
-                            <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">Update Dish</button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-            {/* new menu ends here */}
-
+                        </div>
+                        <div className="flex justify-center py-3 bg-gray-50">
+                          <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors hover:bg-red-600">Delete</button>
+                          <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-colors hover:bg-blue-600">Update</button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </div>
+          {/* new menu ends here */}
+
         </div>
       </div>
     </div>

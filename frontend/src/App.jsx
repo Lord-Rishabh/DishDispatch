@@ -8,7 +8,10 @@ import Login from "./pages/loginPage";
 import Register from "./pages/signupPage";
 import Dashboard from "./pages/Dashboard";
 import Order from "./pages/Order";
+import Menu from "./pages/Menu";
+import QRCodeGenerator from './pages/qrcode';
 
+const restaurantName = "rishabh";
 const App = () => {
   return (
     <>
@@ -26,8 +29,16 @@ const router = createBrowserRouter([
     element: <Order />,
   },
   {
+    path: `/menu/:restaurantName/:tableNumber`,
+    element: <Menu />,
+  },
+  {
     path: "/dashboard",
     element: <Dashboard />,
+  },
+  {
+    path: "/qrcode",
+    element: <QRCodeGenerator />,
   },
   {
     path: "/login",
