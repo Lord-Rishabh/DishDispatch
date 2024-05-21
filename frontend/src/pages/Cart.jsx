@@ -10,9 +10,9 @@ const Cart = () => {
     const [orderDetails, setOrderDetails] = useState({
         restaurantUsername: restaurantName,
         customerName: '',
-        phoneNumber: null,
+        phoneNumber: '',
         tableNumber: tableNumber,
-        orderItems : {}
+        orderItems: []
     });
 
     useEffect(() => {
@@ -45,14 +45,13 @@ const Cart = () => {
                     .filter(dish => dish !== null); // Remove null values
 
                 setCartDishes(updatedCartDishes);
-                console.log(formCart);
             } catch (error) {
                 console.error('Error fetching dishes:', error);
             }
         };
 
         fetchAndUpdateCartDishes();
-    }, [cart])
+    }, [cart, restaurantName]);
 
     const handleIncrement = (dishId) => {
         setCartDishes(prevCartDishes => {
@@ -64,7 +63,7 @@ const Cart = () => {
         setFormCart(prevFormCart => {
             const updatedFormCart = prevFormCart.map(item =>
                 item.dishId === dishId ? { ...item, quantity: item.quantity + 1 } : item
-            )
+            );
             return updatedFormCart;
         });
     };
@@ -84,63 +83,121 @@ const Cart = () => {
         });
     };
 
-    const handleSubmit = async (event) => { 
-    }
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setOrderDetails(prevDetails => ({
+            ...prevDetails,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const orderItems = formCart.map(item => ({
+            dish: item.dishId,
+            quantity: item.quantity
+        }));
+        const orderPayload = {
+            ...orderDetails,
+            orderItems
+        };
+
+            console.log(JSON.stringify(orderPayload));
+        try {
+            const response = await fetch(`http://localhost:3000/api/order/${restaurantName}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderPayload),
+            });
+
+            if (response.ok) {
+                alert('Order placed successfully!');
+            } else {
+                alert('Failed to place the order');
+            }
+        } catch (error) {
+            console.error('Error submitting order:', error);
+        }
+    };
+
     return (
-        <div className='p-5'>
-            {cartDishes.length ? (cartDishes.map((dish) => (
-                <div key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex p-4 bg-white">
-                        <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
-                        <div className="flex flex-col justify-between">
-                            <div>
-                                <h2 className="text-lg font-semibold">{dish.name}</h2>
-                                <p className="text-gray-600 mt-1">{dish.description}</p>
+        <div className="p-5">
+            {cartDishes.length ? (
+                cartDishes.map((dish) => (
+                    <div key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow mb-4">
+                        <div className="flex p-4 bg-white">
+                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+                            <div className="flex flex-col justify-between">
+                                <div>
+                                    <h2 className="text-lg font-semibold">{dish.name}</h2>
+                                    <p className="text-gray-600 mt-1">{dish.description}</p>
+                                </div>
+                                <div className="mt-2 text-sm text-gray-500">
+                                    <p>Category: {dish.category}</p>
+                                    <p>Price: {dish.price}</p>
+                                </div>
                             </div>
-                            <div className="mt-2 text-sm text-gray-500">
-                                <p>Category: {dish.category}</p>
-                                <p>Price: {dish.price}</p>
+                        </div>
+                        <div className="p-4 bg-gray-100">
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => handleDecrement(dish._id)}
+                                    className="py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                                >
+                                    -
+                                </button>
+                                <span className="text-lg">{dish.quantity}</span>
+                                <button
+                                    onClick={() => handleIncrement(dish._id)}
+                                    className="py-1 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                                >
+                                    +
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div className="p-4 bg-gray-100">
-
-                        <div className="flex items-center space-x-2">
-                            <button
-                                onClick={() => handleDecrement(dish._id)}
-                                className="py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-                            >
-                                -
-                            </button>
-                            <span className="text-lg">{dish.quantity}</span>
-                            <button
-                                onClick={() => handleIncrement(dish._id)}
-                                className="py-1 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            ))) : (
-                <h1>No items in the cart</h1>
-
+                ))
+            ) : (
+                <h1 className="text-center text-xl font-semibold">No items in the cart</h1>
             )}
-            <form onSubmit={() => handleSubmit}>
-                <div>
-                    <label htmlFor="name">Your Name</label>
 
+            <form onSubmit={handleSubmit} className="mt-6 bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-semibold mb-4">Place your order</h2>
+                <div className="mb-4">
+                    <label htmlFor="customerName" className="block text-gray-700 font-medium mb-2">Your Name</label>
+                    <input
+                        type="text"
+                        id="customerName"
+                        name="customerName"
+                        value={orderDetails.customerName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                    />
                 </div>
-                
-                <div>
-
+                <div className="mb-4">
+                    <label htmlFor="phoneNumber" className="block text-gray-700 font-medium mb-2">Contact No.</label>
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={orderDetails.phoneNumber}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                    />
                 </div>
-                
-                <div>
-
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        className="py-2 px-6 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                    >
+                        Submit Order
+                    </button>
                 </div>
             </form>
-
         </div>
     );
 };

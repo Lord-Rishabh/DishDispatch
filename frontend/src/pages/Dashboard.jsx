@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Header';
+import QRCodeGenerator from './qrcode';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -150,18 +151,21 @@ const Dashboard = () => {
       <Navbar />
       <div className="p-5">
         <div className="container mx-auto">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-            onClick={() => toggleForm()}
-          >
-            Add Dish
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 ml-4"
-            onClick={() => navigate('/orders')}
-          >
-            View Orders
-          </button>
+          <div className="">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 mr-4"
+              onClick={() => toggleForm()}
+            >
+              Add Dish
+            </button>
+            <QRCodeGenerator />
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 ml-4"
+              onClick={() => navigate('/orders')}
+            >
+              View Orders
+            </button>
+          </div>
 
 
           {isFormOpen && (
