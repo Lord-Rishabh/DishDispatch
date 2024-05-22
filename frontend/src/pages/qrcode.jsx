@@ -59,47 +59,48 @@ const QRCodeGenerator = () => {
   return (
     <>
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4"
         onClick={handleClick}
       >
         Generate QR Code
       </button>
       {openForm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded shadow-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500"
-              onClick={closeForm}
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl mb-4">Enter Table Number</h2>
-            <input
-              type="text"
-              placeholder="Enter Table Number"
-              value={tableNumber}
-              onChange={(e) => setTableNumber(e.target.value)}
-              className="border p-2 mb-4 w-full"
-            />
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-              onClick={generateQRCode}
-            >
-              Generate QR Code
-            </button>
-            {qrCodeUrl && (
-              <div className="text-center">
-                <QRCode id="qrcode" value={qrCodeUrl} />
-                <button
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
-                  onClick={downloadQRCode}
-                >
-                  Download QR Code
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl relative max-w-md w-full">
+          <button
+            className="absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-md flex items-center justify-center hover:bg-red-700 transition duration-200 ease-in-out"
+            onClick={closeForm}
+          >
+            &times;
+          </button>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Enter Table Number</h2>
+          <input
+            type="text"
+            placeholder="Enter Table Number"
+            value={tableNumber}
+            onChange={(e) => setTableNumber(e.target.value)}
+            className="border p-2 mb-4 w-full rounded-md outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-4 transition duration-200 ease-in-out"
+            onClick={generateQRCode}
+          >
+            Generate QR Code
+          </button>
+          {qrCodeUrl && (
+            <div className="text-center">
+              <QRCode id="qrcode" value={qrCodeUrl} />
+              <button
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 transition duration-200 ease-in-out"
+                onClick={downloadQRCode}
+              >
+                Download QR Code
+              </button>
+            </div>
+          )}
         </div>
+      </div>
+  
       )}
     </>
   );

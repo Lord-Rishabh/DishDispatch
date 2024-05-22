@@ -72,24 +72,26 @@ const Header = () => {
               <li className="md:px-4 md:py-2 hover:text-black hover:font-bold"><Link to="/dashboard">Dashboard</Link></li>
               <li className="md:px-4 md:py-2 hover:text-black hover:font-bold"><Link to="/">Contact</Link></li>
             </ul>
-            <div className="md:hidden flex flex-col gap-2 mt-4">
+            {/* For small screens : */}
+            <div className="md:hidden flex flex-col gap-2 mt-2">
               {!token ? (
                 <>
                   <Link to="/login">
-                    <button className="bg-black w-full text-center hover:bg-gray-700 hover:scale-105 ease-in-out rounded-xl text-white font-bold px-4 py-2">Login</button>
+                    <button className="text-white font-semibold bg-black rounded-xl text-center  py-1 px-2">Login</button>
                   </Link>
                   <Link to="/register">
-                    <button className="text-black w-full text-center border-2 border-black hover:scale-105 ease-in-out rounded-xl font-bold px-4 py-2">Sign up</button>
+                    <button className="text-black rounded-xl text-center border-2 border-black py-1 px-0.5 ">Sign up</button>
                   </Link>
                 </>
               ) : (
                 <Link to="/login">
-                  <button className="bg-black w-full text-center hover:bg-gray-700 hover:scale-105 ease-in-out rounded-xl text-white font-bold px-4 py-2" onClick={handleLogout}>Logout</button>
+                  <button className="text-black rounded-xl text-center border-2 border-black py-1 px-2" onClick={handleLogout}>Logout</button>
                 </Link>
               )}
             </div>
           </div>
   
+          {/* For Large screens : */}
           <div className="hidden md:flex order-2 md:order-3 mt-4 md:mt-0">
             {!token ? (
               <>
@@ -102,7 +104,7 @@ const Header = () => {
               </>
             ) : (
               <Link to="/login">
-                <button className="bg-black hover:bg-gray-700 hover:scale-105 ease-in-out rounded-xl text-white font-bold px-4 xl:px-6 py-2 xl:py-3 mr-3" onClick={handleLogout}>Logout</button>
+                <button className="text-black border-2 border-black hover:scale-105 ease-in-out rounded-xl font-bold px-4 xl:px-6 py-2 xl:py-3" onClick={handleLogout}>Logout</button>
               </Link>
             )}
           </div>

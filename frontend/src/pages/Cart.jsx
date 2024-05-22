@@ -71,14 +71,14 @@ const Cart = () => {
     const handleDecrement = (dishId) => {
         setCartDishes(prevCartDishes => {
             const updatedDishes = prevCartDishes.map(dish =>
-                dish._id === dishId && dish.quantity > 1 ? { ...dish, quantity: dish.quantity - 1 } : dish
-            ).filter(dish => dish.quantity > 0);
+                dish._id === dishId ? { ...dish, quantity: dish.quantity - 1 } : dish
+            ).filter(dish => dish.quantity > 0); // Filter out dishes with quantity 0
             return updatedDishes;
         });
         setFormCart(prevFormCart => {
             const updatedFormCart = prevFormCart.map(item =>
-                item.dishId === dishId && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
-            ).filter(item => item.quantity > 0);
+                item.dishId === dishId ? { ...item, quantity: item.quantity - 1 } : item
+            ).filter(item => item.quantity > 0); // Filter out items with quantity 0
             return updatedFormCart;
         });
     };
@@ -102,7 +102,6 @@ const Cart = () => {
             orderItems
         };
 
-            console.log(JSON.stringify(orderPayload));
         try {
             const response = await fetch(`http://localhost:3000/api/order/${restaurantName}/orders`, {
                 method: 'POST',
@@ -120,6 +119,10 @@ const Cart = () => {
         } catch (error) {
             console.error('Error submitting order:', error);
         }
+    };
+
+    const calculateTotalCost = () => {
+        return cartDishes.reduce((total, dish) => total + (dish.price * dish.quantity), 0);
     };
 
     return (
@@ -162,6 +165,10 @@ const Cart = () => {
             ) : (
                 <h1 className="text-center text-xl font-semibold">No items in the cart</h1>
             )}
+
+            <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">Total Cost: Rs {calculateTotalCost().toFixed(2)}</h2>
+            </div>
 
             <form onSubmit={handleSubmit} className="mt-6 bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-2xl font-semibold mb-4">Place your order</h2>

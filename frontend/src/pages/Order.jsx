@@ -38,6 +38,7 @@ const Order = () => {
       const json = await response.json();
       const pendingOrders = json.filter(order => !order.status);
       setOrders(pendingOrders);
+      console.log(json);
     } else {
       navigate('/login');
     }
@@ -57,8 +58,9 @@ const Order = () => {
     } catch (error) {
       console.log(error.message);
     }
-  }
-const fetchDishes = async () => {
+  };
+
+  const fetchDishes = async () => {
     const token = localStorage.getItem('token');
     if (token) {
       const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes`, {
@@ -84,11 +86,11 @@ const fetchDishes = async () => {
       fetchDishes();
       fetchOrders();
 
-      // Set up interval to fetch orders every 5 seconds
+      // Set up interval to fetch orders every 7 seconds
       const interval = setInterval(() => {
         fetchOrders();
       }, 7000);
-      
+
       // Clear interval on component unmount
       return () => clearInterval(interval);
     }
@@ -97,6 +99,18 @@ const fetchDishes = async () => {
   const getDishNameById = (dishId) => {
     const dish = dishes.find(d => d._id === dishId);
     return dish ? dish.name : 'Unknown Dish';
+  };
+
+  const getDishPriceById = (dishId) => {
+    const dish = dishes.find(d => d._id === dishId);
+    return dish ? dish.price : 0;
+  };
+
+  const calculateTotalCost = (orderItems) => {
+    return orderItems.reduce((total, item) => {
+      const price = getDishPriceById(item.dish);
+      return total + (price * item.quantity);
+    }, 0);
   };
 
   return (
@@ -126,6 +140,7 @@ const fetchDishes = async () => {
                   </li>
                 ))}
               </ul>
+              <p className="text-gray-700 mt-4 font-semibold">Total Cost: Rs {calculateTotalCost(order.orderItems).toFixed(2)}</p>
               <div className="p-6 pb-0">
                 <button onClick={() => handleStatusChange(order._id)} className='py-3 px-5 rounded-lg bg-green-200 w-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'> Mark as Completed</button>
               </div>
