@@ -28,7 +28,7 @@ const Homepage = () => {
           <img
             height={300}
             width={1000}
-            src='../../public/salad.jpg'
+            src='/salad.jpg'
             alt="Salad"
           />
         </div>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
     const { restaurantName, tableNumber } = useParams();
@@ -112,12 +114,13 @@ const Cart = () => {
             });
 
             if (response.ok) {
-                alert('Order placed successfully!');
+                toast.success('Order placed successfully!');
             } else {
-                alert('Failed to place the order');
+                toast.error('Failed to place the order');
             }
         } catch (error) {
             console.error('Error submitting order:', error);
+            toast.error('Error submitting order');
         }
     };
 
@@ -127,6 +130,7 @@ const Cart = () => {
 
     return (
         <div className="p-5">
+            <ToastContainer />
             {cartDishes.length ? (
                 cartDishes.map((dish) => (
                     <div key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow mb-4">

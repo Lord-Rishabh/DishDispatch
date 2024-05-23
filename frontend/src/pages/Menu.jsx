@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { IoBagHandleOutline } from "react-icons/io5";
+import { FiSearch } from 'react-icons/fi';
 
 const Menu = () => {
     const navigate = useNavigate();
@@ -21,8 +23,7 @@ const Menu = () => {
     const categorizedByCategory = (dishes) => {
         const menu = {};
         dishes.forEach((dish) => {
-            if (!menu[dish.category])
-                menu[dish.category] = [];
+            if (!menu[dish.category]) menu[dish.category] = [];
             menu[dish.category].push(dish);
         });
         setDishes(menu);
@@ -46,8 +47,6 @@ const Menu = () => {
             return;
         }
 
-        // reduce function will iterate over each category and filter dishes based on query
-        // dishes is not an array, it is an object with category as key and dishes as value array that's why we are using Object.entries
         const filtered = Object.entries(dishes).reduce((acc, [category, dishes]) => {
             const filteredDishes = dishes.filter(dish =>
                 dish.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -55,10 +54,9 @@ const Menu = () => {
                 dish.category.toLowerCase().includes(query.toLowerCase()) ||
                 dish.price.toString().includes(query)
             );
-            if (filteredDishes.length)
-                acc[category] = filteredDishes;
+            if (filteredDishes.length) acc[category] = filteredDishes;
             return acc;
-        }, {})
+        }, {});
 
         setFilteredDishes(filtered);
     };
@@ -69,7 +67,6 @@ const Menu = () => {
             newCart[dish._id] = (newCart[dish._id] || 0) + 1;
             return newCart;
         });
-        console.log(cart);
     };
 
     const handleIncrement = (dishId) => {
@@ -77,7 +74,6 @@ const Menu = () => {
             ...prevCart,
             [dishId]: prevCart[dishId] + 1
         }));
-        console.log(cart);
     };
 
     const handleDecrement = (dishId) => {
@@ -90,7 +86,6 @@ const Menu = () => {
             }
             return newCart;
         });
-        console.log(cart);
     };
 
     const handleCart = () => {
@@ -105,41 +100,53 @@ const Menu = () => {
         filterDishes(searchQuery);
     }, [searchQuery, dishes]);
 
+    const cartItemCount = Object.values(cart).reduce((total, count) => total + count, 0);
+
     return (
         <div>
             {/* Navbar */}
-            <div className="flex justify-center mt-8">
-                <div className="bg-gray-300 shadow-md rounded-full px-8 py-3 flex items-center space-x-4 w-3/4 max-w-4xl">
+            <div className="flex justify-between items-center mt-8 px-4 py-3 bg-white shadow-md rounded-full max-w-4xl mx-auto border-2 border-gray-300">
+                <div className="flex items-center bg-gray-300 shadow-inner rounded-full px-5 py-2 w-full max-w-2xl">
                     <input
                         type="text"
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-gray-100 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full bg-blue-50 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
+                    <FiSearch className="text-gray-500 ml-2" size={23} />
                 </div>
-                    <button onClick={() => handleCart()} className="bg-indigo-500 text-white text-lg rounded-xl ml-12 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
-                        Cart
-                    </button>
+                <button className="relative">
+                    <IoBagHandleOutline
+                        onClick={() => handleCart()}
+                        size={40}
+                        className="text-gray-700 hover:text-gray-900 transition-colors"
+                    />
+                    {cartItemCount > 0 && (
+                        <span className="absolute bottom-6 left-6 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                            {cartItemCount}
+                        </span>
+                    )}
+                </button>
             </div>
             {/* Navbar ends here */}
 
             {/* Menu */}
-            <div className="container mx-auto p-4">
+            <div className="container mx-auto p-4 mt-6">
                 {Object.entries(filteredDishes).map(([category, dishes]) => (
-                    <div key={category} className="mb-6">
+                    <div key={category} className="mb-8">
                         <button
                             onClick={() => toggleCategory(category)}
-                            className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                            className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-md"
                         >
-                            <span className="text-xl font-semibold">{category}</span>
+                            <span className="text-xl font-bold">{category}</span>
                             <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
                         </button>
                         {expandedCategories[category] && (
-                            <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {dishes.map((dish) => (
-                                    <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                        <div className="flex p-4 bg-white">
+                                    <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                                        <div className="flex p-4 bg-white relative">
                                             <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
                                             <div className="flex flex-col justify-between">
                                                 <div>
@@ -172,7 +179,7 @@ const Menu = () => {
                                             ) : (
                                                 <button
                                                     onClick={() => handleAddToCart(dish)}
-                                                    className="py-2 px-4 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                                    className="py-2 px-4 rounded-lg bg-gray-700 text-white font-semibold hover:bg-white hover:text-black border-2 border-black transition-colors"
                                                 >
                                                     Add to Cart
                                                 </button>
@@ -190,4 +197,4 @@ const Menu = () => {
     );
 };
 
-export default Menu
+export default Menu;
