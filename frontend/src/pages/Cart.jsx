@@ -20,7 +20,7 @@ const Cart = () => {
     useEffect(() => {
         const fetchAndUpdateCartDishes = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/dish/${restaurantName}/dishes`, {
+                const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/dish/${restaurantName}/dishes`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const Cart = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:3000/api/order/${restaurantName}/orders`, {
+            const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/order/${restaurantName}/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -57,7 +57,7 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = formData._id ? `http://localhost:3000/api/dish/${user}/dishes/${formData._id}` : `http://localhost:3000/api/dish/${user}/dishes`;
+      const url = formData._id ? `${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes/${formData._id}` : `${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes`;
       const method = formData._id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -86,7 +86,7 @@ const Dashboard = () => {
 
   const deleteDish = async (dishId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes/${dishId}`, {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes/${dishId}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Dashboard = () => {
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      const response = await fetch('http://localhost:3000/api/auth/userDetails', {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/auth/userDetails`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     fetchUser();
     if (token) {
-      const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes`, {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

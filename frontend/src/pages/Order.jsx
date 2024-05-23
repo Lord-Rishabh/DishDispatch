@@ -11,7 +11,7 @@ const Order = () => {
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      const response = await fetch('http://localhost:3000/api/auth/userDetails', {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/auth/userDetails`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ const Order = () => {
   const fetchOrders = async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      const response = await fetch(`http://localhost:3000/api/order/${user}/orders`, {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/order/${user}/orders`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const Order = () => {
 
   const handleStatusChange = async (orderId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/order/${user}/orders/${orderId}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/order/${user}/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const Order = () => {
   const fetchDishes = async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      const response = await fetch(`http://localhost:3000/api/dish/${user}/dishes`, {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

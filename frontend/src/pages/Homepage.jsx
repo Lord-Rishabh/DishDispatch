@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from "../components/Header";
 import { Link } from "react-router-dom";
 
 const Homepage = () => {
+
   return (
     <>
       <Navbar />

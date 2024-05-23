@@ -38,7 +38,7 @@ const QRCodeGenerator = () => {
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      const response = await fetch('http://localhost:3000/api/auth/userDetails', {
+      const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/auth/userDetails`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
