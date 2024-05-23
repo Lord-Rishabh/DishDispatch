@@ -6,10 +6,8 @@ const connectToMongo = require('./db');
 connectToMongo();
 const PORT = 3000;
 app.use(express.json());
-const authRoutes = require('./routes/auth');
 const cors = require('cors')
 
-app.use('/auth', authRoutes);
 app.use(cors());
 
 app.get('/', (req, res) => {
@@ -25,9 +23,9 @@ app.get('/login', (req, res) => {
 })
 
 //Available Routes 
-app.use('/api/dish', require('./routes/dish'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/order', require('./routes/order'));
+app.use('/api/dish', require('./routes/dish'));
 
 app.listen(PORT, () => {
   console.log("Server is running on port 3000");

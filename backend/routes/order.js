@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fetchuser = require('../middleware/middleware');
-const Order = require('../models/Order');
+const Order = require('../models/order');
 
 // Route to get all the orders of a restaurant
 router.get('/:restaurantUsername/orders', fetchuser, async (req, res) => { 

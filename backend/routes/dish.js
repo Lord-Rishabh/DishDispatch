@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Dish = require('../models/Dish');
+const Dish = require('../models/dish');
 const fetchuser = require('../middleware/middleware');
 
 // Route to get all dishes from a particular restaurantUsername
