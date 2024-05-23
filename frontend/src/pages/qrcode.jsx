@@ -10,7 +10,7 @@ const QRCodeGenerator = () => {
   const navigate = useNavigate();
 
   const generateQRCode = () => {
-    const url = `http://localhost:5173/menu/${user}/${tableNumber}`;
+    const url = `https://dish-dispatch.vercel.app/menu/${user}/${tableNumber}`;
     setQRCodeUrl(url);
   };
 
