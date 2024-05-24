@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode.react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const QRCodeGenerator = () => {
   const [tableNumber, setTableNumber] = useState('');
@@ -10,6 +12,10 @@ const QRCodeGenerator = () => {
   const navigate = useNavigate();
 
   const generateQRCode = () => {
+    if (!tableNumber) {
+      toast.error('Please enter a table number');
+      return;
+    }
     const url = `https://dish-dispatch.vercel.app/menu/${user}/${tableNumber}`;
     setQRCodeUrl(url);
   };
@@ -62,6 +68,7 @@ const QRCodeGenerator = () => {
         className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4"
         onClick={handleClick}
       >
+      <ToastContainer />
         Generate QR Code
       </button>
       {openForm && (

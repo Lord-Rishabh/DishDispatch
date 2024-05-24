@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Header';
 import QRCodeGenerator from './qrcode';
+import Spinner from '../components/Spinner';
+import Loader from '../components/Loader';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [pageLoad, setPageLoad] = useState(false);
+  const [buttonLoad, setButtonLoad] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [dishes, setDishes] = useState([]);
   const [formData, setFormData] = useState({
@@ -30,7 +37,6 @@ const Dashboard = () => {
         menu[dish.category] = [];
       menu[dish.category].push(dish);
     });
-    console.log(menu);
     setDishes(menu);
   }
 
@@ -56,6 +62,7 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setButtonLoad(true);
     try {
       const url = formData._id ? `${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes/${formData._id}` : `${import.meta.env.VITE_serverUrl}/api/dish/${user}/dishes`;
       const method = formData._id ? 'PUT' : 'POST';
@@ -69,7 +76,6 @@ const Dashboard = () => {
         body: JSON.stringify(formData),
       });
       const json = await response.json();
-      console.log(json);
       setIsFormOpen(false);
       setFormData({
         name: '',
@@ -78,10 +84,16 @@ const Dashboard = () => {
         price: '',
         image_url: ''
       });
+      if (formData._id)
+        toast.success('Dish updated successfully!');
+      else
+        toast.success('Dish added successfully!');
+
       fetchDishes();
     } catch (error) {
-      console.error('Error:', error);
+      toast.error(error.message);
     }
+    setButtonLoad(false);
   };
 
   const deleteDish = async (dishId) => {
@@ -93,11 +105,10 @@ const Dashboard = () => {
           "auth-token": localStorage.getItem('token')
         },
       });
-      const json = await response.json();
-      console.log(json);
+      toast.success('Dish deleted successfully!');  
       fetchDishes();
     } catch (error) {
-      console.error('Error:', error);
+      toast.error(error.message);
     }
   };
   const fetchUser = async () => {
@@ -135,167 +146,172 @@ const Dashboard = () => {
     }
   };
 
-
   useEffect(() => {
+    setPageLoad(true);
     fetchUser();
   }, []);
 
   useEffect(() => {
     if (user) {
-      fetchDishes(); // Fetch dishes after user state is updated
+      fetchDishes().finally(() => setPageLoad(false)); // Fetch dishes after user state is updated
+
     }
   }, [user]);
 
   return (
     <div>
       <Navbar />
-      <div className="p-5">
-        <div className="container mx-auto">
-          <div className="flex justify-around">
-            <button
-              className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4"
-              onClick={() => toggleForm()}
-            >
-              Add Dish
-            </button>
-            <QRCodeGenerator />
-            <button
-              className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4 "
-              onClick={() => navigate('/orders')}
-            >
-              View Orders
-            </button>
-          </div>
-
-
-          {isFormOpen && (
-            <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <div className="relative bg-white p-8 rounded-lg shadow-xl max-w-lg w-full">
-                <button
-                  onClick={toggleForm}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-md flex items-center justify-center hover:bg-red-700 transition duration-200 ease-in-out"
-                >
-                  &times;
-                </button>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Dish Information</h2>
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
-                    <label className="block text-md text-gray-600 mb-2" htmlFor="name">Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      placeholder="Enter the dish name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-md text-gray-600 mb-2" htmlFor="description">Description</label>
-                    <input
-                      type="text"
-                      id="description"
-                      name="description"
-                      placeholder="Enter the description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-md text-gray-600 mb-2" htmlFor="category">Category</label>
-                    <input
-                      type="text"
-                      id="category"
-                      name="category"
-                      placeholder="Enter the category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-md text-gray-600 mb-2" htmlFor="price">Price</label>
-                    <input
-                      type="number"
-                      id="price"
-                      name="price"
-                      placeholder="Enter the price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-md text-gray-600 mb-2" htmlFor="image_url">Image URL</label>
-                    <input
-                      type="text"
-                      id="image_url"
-                      name="image_url"
-                      placeholder="Enter the image URL"
-                      value={formData.image_url}
-                      onChange={handleInputChange}
-                      required
-                      className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button type="submit" className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-200 ease-in-out mr-2">Submit</button>
-                    <button type="button" onClick={toggleForm} className="bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-700 transition duration-200 ease-in-out">Close</button>
-                  </div>
-                </form>
-              </div>
+      <ToastContainer />
+      {pageLoad ? <Spinner /> :
+        <div className="p-5">
+          <div className="container mx-auto">
+            <div className="flex justify-around">
+              <button
+                className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4"
+                onClick={() => toggleForm()}
+              >
+                Add Dish
+              </button>
+              <QRCodeGenerator />
+              <button
+                className="bg-gray-800 hover:scale-105 ease-in-out rounded-lg text-white text-lg font-semibold py-2 px-4 mb-4 mr-4 "
+                onClick={() => navigate('/orders')}
+              >
+                View Orders
+              </button>
             </div>
-          )}
 
-          {/* new menu */}
-          <div className="container mx-auto p-4">
-            {Object.entries(dishes).map(([category, dishes]) => (
-              <div key={category} className="mb-12">
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-white border-black border-2 hover:bg-gray-200 focus:outline-none  "
-                >
-                  <span className="text-xl font-bold">{category}</span>
-                  <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
-                </button>
-                {expandedCategories[category] && (
-                  <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {dishes.map((dish) => (
-                      <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex p-4 bg-gray-50">
-                          <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
-                          <div className="flex flex-col justify-between">
-                            <div>
-                              <h2 className="text-lg font-semibold">{dish.name}</h2>
-                              <p className="text-gray-900 mt-1">{dish.description}</p>
-                            </div>
-                            <div className="mt-2 text-sm text-gray-900 ">
-                              <p><span className="font-semibold text-black">Category:</span> {dish.category}</p>
-                              <p><span className="font-semibold text-black">Price:</span> {dish.price}</p>
+
+            {isFormOpen && (
+              <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="relative bg-white p-8 rounded-lg shadow-xl max-w-lg w-full">
+                  <button
+                    onClick={toggleForm}
+                    className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-md flex items-center justify-center hover:bg-red-700 transition duration-200 ease-in-out"
+                  >
+                    &times;
+                  </button>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Dish Information</h2>
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                      <label className="block text-md text-gray-600 mb-2" htmlFor="name">Name</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter the dish name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-md text-gray-600 mb-2" htmlFor="description">Description</label>
+                      <input
+                        type="text"
+                        id="description"
+                        name="description"
+                        placeholder="Enter the description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-md text-gray-600 mb-2" htmlFor="category">Category</label>
+                      <input
+                        type="text"
+                        id="category"
+                        name="category"
+                        placeholder="Enter the category"
+                        value={formData.category}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-md text-gray-600 mb-2" htmlFor="price">Price</label>
+                      <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        placeholder="Enter the price"
+                        value={formData.price}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-md text-gray-600 mb-2" htmlFor="image_url">Image URL</label>
+                      <input
+                        type="text"
+                        id="image_url"
+                        name="image_url"
+                        placeholder="Enter the image URL"
+                        value={formData.image_url}
+                        onChange={handleInputChange}
+                        required
+                        className="px-4 py-2 border rounded-md w-full outline-none focus:border-blue-500 transition duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button type="submit" className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-200 ease-in-out mr-2">
+                        {buttonLoad ? <Loader /> : 'Submit'}
+                      </button>
+                      <button type="button" onClick={toggleForm} className="bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-700 transition duration-200 ease-in-out">Close</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* new menu */}
+            <div className="container mx-auto p-4">
+              {Object.entries(dishes).map(([category, dishes]) => (
+                <div key={category} className="mb-12">
+                  <button
+                    onClick={() => toggleCategory(category)}
+                    className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-white border-black border-2 hover:bg-gray-200 focus:outline-none  "
+                  >
+                    <span className="text-xl font-bold">{category}</span>
+                    <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
+                  </button>
+                  {expandedCategories[category] && (
+                    <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {dishes.map((dish) => (
+                        <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex p-4 bg-gray-50">
+                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+                            <div className="flex flex-col justify-between">
+                              <div>
+                                <h2 className="text-lg font-semibold">{dish.name}</h2>
+                                <p className="text-gray-900 mt-1">{dish.description}</p>
+                              </div>
+                              <div className="mt-2 text-sm text-gray-900 ">
+                                <p><span className="font-semibold text-black">Category:</span> {dish.category}</p>
+                                <p><span className="font-semibold text-black">Price:</span> {dish.price}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex justify-center py-3 bg-gray-200">
-                          <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors hover:bg-red-600">Delete</button>
-                          <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-colors hover:bg-blue-600">Update</button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-          {/* new menu ends here */}
+                          <div className="flex justify-center py-3 bg-gray-200">
+                            <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors hover:bg-red-600">Delete</button>
+                            <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-colors hover:bg-blue-600">Update</button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* new menu ends here */}
 
-        </div>
-      </div>
+          </div>
+        </div>}
     </div>
 
   );

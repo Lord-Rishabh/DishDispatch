@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Header';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
+import Spinner from '../components/Spinner';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Order = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [dishes, setDishes] = useState([]);
+  const [pageLoad, setPageLoad] = useState(true); // For initial page load
+  const [loadingId, setLoadingId] = useState(null); // For state change loader
 
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
@@ -45,6 +51,7 @@ const Order = () => {
   };
 
   const handleStatusChange = async (orderId) => {
+    setLoadingId(orderId);
     try {
       const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/order/${user}/orders/${orderId}/status`, {
         method: 'PUT',
@@ -53,11 +60,12 @@ const Order = () => {
           'auth-token': localStorage.getItem('token')
         }
       });
-      const json = await response.json();
+      toast.success('Order marked as completed!');
       fetchOrders();
     } catch (error) {
-      console.log(error.message);
+      toast.error(error.message);
     }
+    setLoadingId(null);
   };
 
   const fetchDishes = async () => {
@@ -84,8 +92,8 @@ const Order = () => {
   useEffect(() => {
     if (user) {
       fetchDishes();
-      fetchOrders();
-
+      fetchOrders().finally(() => setPageLoad(false));
+      
       // Set up interval to fetch orders every 7 seconds
       const interval = setInterval(() => {
         fetchOrders();
@@ -113,43 +121,55 @@ const Order = () => {
     }, 0);
   };
 
+  const formatOrderTime = (time) => {
+    const date = new Date(time);
+    const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
+    const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+    const formattedDate = date.toLocaleDateString('en-US', optionsDate);
+    const formattedTime = date.toLocaleTimeString('en-US', optionsTime);
+    return `${formattedTime}, ${formattedDate}`;
+  };
+
   return (
     <>
       <Navbar />
-      <div className="max-w-4xl mx-auto p-4">
-        <h2 className="text-3xl font-bold mb-6 text-center">Orders</h2>
-        {orders.length > 0 ? (
-          orders.map((order, index) => (
-            <div
-              key={index}
-              className="border border-gray-300 rounded-lg p-4 mb-4 shadow-lg hover:shadow-xl transition-shadow"
-            >
-              <h3 className="text-xl font-semibold mb-2">Customer: {order.customerName}</h3>
-              <p className="text-gray-700">Phone Number: {order.phoneNumber}</p>
-              <p className="text-gray-700">Restaurant: {order.restaurantUsername}</p>
-              <p className="text-gray-700">Table Number: {order.tableNumber}</p>
-              <p className="text-gray-700">
-                Status: <span className={order.status ? "text-green-500" : "text-red-500"}>{order.status ? 'Completed' : 'Pending'}</span>
-              </p>
-              <p className="text-gray-700">Order Time: {new Date(order.time).toLocaleString()}</p>
-              <h4 className="text-lg font-medium mt-4 mb-2">Order Items:</h4>
-              <ul className="list-disc list-inside">
-                {order.orderItems.map((item, idx) => (
-                  <li key={idx} className="text-gray-700">
-                    Dish: {getDishNameById(item.dish)}, Quantity: {item.quantity}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-gray-700 mt-4 font-semibold">Total Cost: Rs {calculateTotalCost(order.orderItems).toFixed(2)}</p>
-              <div className="p-6 pb-0">
-                <button onClick={() => handleStatusChange(order._id)} className='py-3 px-5 rounded-lg bg-green-200 w-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'> Mark as Completed</button>
+      <ToastContainer />
+      {pageLoad ? <Spinner /> : (
+        <div className="max-w-4xl mx-auto p-4">
+          <h2 className="text-3xl font-bold mb-6 text-center">Orders</h2>
+          {orders.length > 0 ? (
+            orders.map((order, index) => (
+              <div
+                key={index}
+                className="border border-gray-300 rounded-lg p-4 mb-4 shadow-lg hover:shadow-xl transition-shadow"
+              >
+                <h3 className="text-xl font-semibold mb-2">Customer: {order.customerName}</h3>
+                <p className="text-gray-700">Phone Number: {order.phoneNumber}</p>
+                <p className="text-gray-700">Restaurant: {order.restaurantUsername}</p>
+                <p className="text-gray-700">Table Number: {order.tableNumber}</p>
+                <p className="text-gray-700">
+                  Status: <span className={order.status ? "text-green-500" : "text-red-500"}>{order.status ? 'Completed' : 'Pending'}</span>
+                </p>
+                <p className="text-gray-700">Order Time: {formatOrderTime(order.time)}</p>
+                <h4 className="text-lg font-medium mt-4 mb-2">Order Items:</h4>
+                <ul className="list-disc list-inside">
+                  {order.orderItems.map((item, idx) => (
+                    <li key={idx} className="text-gray-700">
+                      Dish: {getDishNameById(item.dish)}, Quantity: {item.quantity}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-gray-700 mt-4 font-semibold">Total Cost: Rs {calculateTotalCost(order.orderItems).toFixed(2)}</p>
+                <div className="p-6 pb-0">
+                  <button onClick={() => handleStatusChange(order._id)} className='py-3 px-5 rounded-lg bg-green-200 w-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'> {loadingId == order._id ? <Loader /> : 'Mark as Completed'}</button>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-500">No orders found.</p>
-        )}
-      </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No orders found.</p>
+          )}
+        </div>
+      )}
     </>
   );
 };

@@ -105,17 +105,20 @@ const Menu = () => {
     return (
         <div>
             {/* Navbar */}
-            <div className="flex justify-between items-center mt-8 px-4 py-3 bg-white shadow-md rounded-full max-w-4xl mx-auto border-2 border-gray-300">
-                <div className="flex items-center bg-gray-300 shadow-inner rounded-full px-5 py-2 w-full max-w-2xl">
+            <div className="flex justify-between items-center mt-8 px-4 py-3 bg-white  rounded-full max-w-4xl mx-auto ">
+
+                <div className="flex items-center  w-full max-w-2xl relative">
                     <input
                         type="text"
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-blue-50 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        className="w-full bg-blue-50 rounded-full px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 border-2 border-gray-800"
                     />
-                    <FiSearch className="text-gray-500 ml-2" size={23} />
+                    <FiSearch className="text-gray-500 absolute right-4" size={23} />
                 </div>
+
+
                 <button className="relative">
                     <IoBagHandleOutline
                         onClick={() => handleCart()}
@@ -132,12 +135,12 @@ const Menu = () => {
             {/* Navbar ends here */}
 
             {/* Menu */}
-            <div className="container mx-auto p-4 mt-6">
+            <div className="container mx-auto p-4 mt-6 px-12 max-md:px-8">
                 {Object.entries(filteredDishes).map(([category, dishes]) => (
                     <div key={category} className="mb-8">
                         <button
                             onClick={() => toggleCategory(category)}
-                            className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-md"
+                            className="flex items-center justify-between w-full py-3 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 duration-300 shadow-md "
                         >
                             <span className="text-xl font-bold">{category}</span>
                             <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
