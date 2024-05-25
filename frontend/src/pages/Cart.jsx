@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from '../components/Spinner';
+import Loader from '../components/Loader';
 
 const Cart = () => {
     const { restaurantName, tableNumber } = useParams();
@@ -9,6 +11,8 @@ const Cart = () => {
     const { cart } = location.state || { cart: {} };
     const [cartDishes, setCartDishes] = useState([]);
     const [formCart, setFormCart] = useState([]);
+    const [pageLoading, setPageLoading] = useState(true);
+    const [buttonLoad, setButtonLoad] = useState(false);
     const [orderDetails, setOrderDetails] = useState({
         restaurantUsername: restaurantName,
         customerName: '',
@@ -50,6 +54,7 @@ const Cart = () => {
             } catch (error) {
                 console.error('Error fetching dishes:', error);
             }
+            setPageLoading(false);
         };
 
         fetchAndUpdateCartDishes();
@@ -94,6 +99,7 @@ const Cart = () => {
     };
 
     const handleSubmit = async (e) => {
+        setButtonLoad(true);
         e.preventDefault();
         const orderItems = formCart.map(item => ({
             dish: item.dishId,
@@ -103,7 +109,11 @@ const Cart = () => {
             ...orderDetails,
             orderItems
         };
-
+        if(cartDishes.length === 0) {
+            toast.error('No items in the cart');
+            setButtonLoad(false);
+            return;
+        }
         try {
             const response = await fetch(`${import.meta.env.VITE_serverUrl}/api/order/${restaurantName}/orders`, {
                 method: 'POST',
@@ -122,6 +132,7 @@ const Cart = () => {
             console.error('Error submitting order:', error);
             toast.error('Error submitting order');
         }
+        setButtonLoad(false);
     };
 
     const calculateTotalCost = () => {
@@ -129,88 +140,90 @@ const Cart = () => {
     };
 
     return (
-        <div className="p-5">
-            <ToastContainer />
-            {cartDishes.length ? (
-                cartDishes.map((dish) => (
-                    <div key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow mb-4">
-                        <div className="flex p-4 bg-white">
-                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
-                            <div className="flex flex-col justify-between">
-                                <div>
-                                    <h2 className="text-lg font-semibold">{dish.name}</h2>
-                                    <p className="text-gray-600 mt-1">{dish.description}</p>
+        <>
+            {pageLoading ? <Spinner /> :
+                <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+                    <ToastContainer />
+                    <h1 className='text-center text-3xl font-bold text-indigo-700 py-6 pt-3'>
+                        {cartDishes.length ? 'Your Cart' : 'No items in the cart'}
+                    </h1>
+                    {cartDishes.map((dish) => (
+                        <div key={dish._id} className="border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-4">
+                            <div className="flex p-4 bg-white">
+                                <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
+                                <div className="flex flex-col justify-between">
+                                    <div>
+                                        <h2 className="text-xl font-semibold text-gray-800">{dish.name}</h2>
+                                        <p className="text-gray-600 mt-1">{dish.description}</p>
+                                    </div>
+                                    <div className="mt-2 text-sm text-gray-500">
+                                        <p>Category: {dish.category}</p>
+                                        <p>Price: ₹{dish.price}</p>
+                                    </div>
                                 </div>
-                                <div className="mt-2 text-sm text-gray-500">
-                                    <p>Category: {dish.category}</p>
-                                    <p>Price: {dish.price}</p>
+                            </div>
+                            <div className="p-4 bg-indigo-50">
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={() => handleDecrement(dish._id)}
+                                        className="py-1 px-3 rounded-lg bg-red-400 text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors"
+                                    >
+                                        -
+                                    </button>
+                                    <span className="text-lg">{dish.quantity}</span>
+                                    <button
+                                        onClick={() => handleIncrement(dish._id)}
+                                        className="py-1 px-3 rounded-lg bg-green-400 text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
+                                    >
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div className="p-4 bg-gray-100">
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={() => handleDecrement(dish._id)}
-                                    className="py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-                                >
-                                    -
-                                </button>
-                                <span className="text-lg">{dish.quantity}</span>
-                                <button
-                                    onClick={() => handleIncrement(dish._id)}
-                                    className="py-1 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-                                >
-                                    +
-                                </button>
-                            </div>
-                        </div>
+                    ))}
+                    <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
+                        <h2 className="text-xl font-semibold text-gray-800">Total Cost: ₹{calculateTotalCost().toFixed(2)}</h2>
                     </div>
-                ))
-            ) : (
-                <h1 className="text-center text-xl font-semibold">No items in the cart</h1>
-            )}
-
-            <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">Total Cost: Rs {calculateTotalCost().toFixed(2)}</h2>
-            </div>
-
-            <form onSubmit={handleSubmit} className="mt-6 bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-semibold mb-4">Place your order</h2>
-                <div className="mb-4">
-                    <label htmlFor="customerName" className="block text-gray-700 font-medium mb-2">Your Name</label>
-                    <input
-                        type="text"
-                        id="customerName"
-                        name="customerName"
-                        value={orderDetails.customerName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        required
-                    />
+                    <form onSubmit={handleSubmit} className="mt-6 bg-white p-6 rounded-lg shadow-md">
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Place your order</h2>
+                        <div className="mb-4">
+                            <label htmlFor="customerName" className="block text-gray-700 font-medium mb-2">Your Name</label>
+                            <input
+                                type="text"
+                                id="customerName"
+                                name="customerName"
+                                value={orderDetails.customerName}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="phoneNumber" className="block text-gray-700 font-medium mb-2">Contact No.</label>
+                            <input
+                                type="tel"
+                                id="phoneNumber"
+                                name="phoneNumber"
+                                value={orderDetails.phoneNumber}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                className="py-2 px-6 rounded-lg  bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 duration-200"
+                            >
+                                {buttonLoad ? <Loader /> : 'Place Order'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div className="mb-4">
-                    <label htmlFor="phoneNumber" className="block text-gray-700 font-medium mb-2">Contact No.</label>
-                    <input
-                        type="tel"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={orderDetails.phoneNumber}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        required
-                    />
-                </div>
-                <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        className="py-2 px-6 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                    >
-                        Submit Order
-                    </button>
-                </div>
-            </form>
-        </div>
+            }
+        </>
     );
+    
 };
 
 export default Cart;

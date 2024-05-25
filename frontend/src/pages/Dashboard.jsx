@@ -281,22 +281,22 @@ const Dashboard = () => {
                     <span className="text-xl">{expandedCategories[category] ? '-' : '+'}</span>
                   </button>
                   {expandedCategories[category] && (
-                    <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {dishes.map((dish) => (
-                        <li key={dish._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex p-4 bg-gray-50">
-                            <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
-                            <div className="flex flex-col justify-between">
-                              <div>
-                                <h2 className="text-lg font-semibold">{dish.name}</h2>
-                                <p className="text-gray-900 mt-1">{dish.description}</p>
-                              </div>
-                              <div className="mt-2 text-sm text-gray-900 ">
-                                <p><span className="font-semibold text-black">Category:</span> {dish.category}</p>
-                                <p><span className="font-semibold text-black">Price:</span> {dish.price}</p>
-                              </div>
+                    <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+                    {dishes.map((dish) => (
+                        <li key={dish._id} className="border border-gray-300 rounded-lg overflow-hidden shadow hover:shadow-xl transition-shadow duration-300">
+                            <div className="flex flex-col sm:flex-row p-4 bg-white">
+                                <img src={dish.image_url} alt={dish.name} className="w-full sm:w-32 sm:h-32 object-cover rounded-md mb-4 sm:mb-0 sm:mr-4" />
+                                <div className="flex flex-col justify-between flex-grow">
+                                    <div>
+                                        <h2 className="text-lg sm:text-xl font-semibold">{dish.name}</h2>
+                                        <p className="text-gray-500 text-sm sm:text-base mt-1">{dish.description}</p>
+                                    </div>
+                                    <div className="mt-2 text-sm text-gray-500">
+                                        <p>Category: {dish.category}</p>
+                                        <p>Price: ${dish.price}</p>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
                           <div className="flex justify-center py-3 bg-gray-200">
                             <button onClick={() => deleteDish(dish._id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors hover:bg-red-600">Delete</button>
                             <button onClick={() => toggleForm(dish)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-colors hover:bg-blue-600">Update</button>
