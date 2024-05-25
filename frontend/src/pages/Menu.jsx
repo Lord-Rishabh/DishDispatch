@@ -159,7 +159,7 @@ const Menu = () => {
                                                     </div>
                                                     <div className="mt-2 text-sm text-gray-500">
                                                         <p>Category: {dish.category}</p>
-                                                        <p>Price: ${dish.price}</p>
+                                                        <p>Price: Rs {dish.price}</p>
                                                     </div>
                                                 </div>
                                             </div>
