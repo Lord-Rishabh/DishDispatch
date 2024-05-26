@@ -13,6 +13,7 @@ const Order = () => {
   const [dishes, setDishes] = useState([]);
   const [pageLoad, setPageLoad] = useState(true); // For initial page load
   const [loadingId, setLoadingId] = useState(null); // For state change loader
+  const [showPending, setShowPending] = useState(true); // State to toggle between all orders and pending orders
 
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
@@ -42,8 +43,12 @@ const Order = () => {
         },
       });
       const json = await response.json();
-      const pendingOrders = json.filter(order => !order.status);
-      setOrders(pendingOrders);
+      if (showPending) {
+        const pendingOrders = json.filter(order => !order.status);
+        setOrders(pendingOrders);
+      } else {
+        setOrders(json);
+      }
       console.log(json);
     } else {
       navigate('/login');
@@ -102,7 +107,7 @@ const Order = () => {
       // Clear interval on component unmount
       return () => clearInterval(interval);
     }
-  }, [user]);
+  }, [user, showPending]);
 
   const getDishNameById = (dishId) => {
     const dish = dishes.find(d => d._id === dishId);
@@ -121,14 +126,7 @@ const Order = () => {
     }, 0);
   };
 
-  const formatOrderTime = (time) => {
-    const date = new Date(time);
-    const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
-    const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
-    const formattedDate = date.toLocaleDateString('en-US', optionsDate);
-    const formattedTime = date.toLocaleTimeString('en-US', optionsTime);
-    return `${formattedTime}, ${formattedDate}`;
-  };
+
 
   return (
     <>
@@ -137,6 +135,20 @@ const Order = () => {
       {pageLoad ? <Spinner /> : (
         <div className="max-w-4xl mx-auto p-4">
           <h2 className="text-3xl font-bold mb-6 text-center">Orders</h2>
+          <div className="flex justify-center mb-4 font-semibold ">
+            <button
+              onClick={() => setShowPending(true)}
+              className={`py-2 px-4 mx-2 rounded transition-transform hover:scale-105 duration-200  ${showPending ? 'bg-[#2563eb] text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              View Pending Orders
+            </button>
+            <button
+              onClick={() => setShowPending(false)}
+              className={`py-2 px-4 mx-2 rounded transition-transform hover:scale-105 duration-200 ${!showPending ? 'bg-[#2563eb] text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              View All Orders
+            </button>
+          </div>
           {orders.length > 0 ? (
             orders.map((order, index) => (
               <div
@@ -161,7 +173,7 @@ const Order = () => {
                 </ul>
                 <p className="text-gray-700 mt-4 font-semibold">Total Cost: Rs {calculateTotalCost(order.orderItems).toFixed(2)}</p>
                 <div className="p-6 pb-0">
-                  <button onClick={() => handleStatusChange(order._id)} className='py-3 px-5 rounded-lg bg-green-200 w-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'> {loadingId == order._id ? <Loader /> : 'Mark as Completed'}</button>
+                  <button onClick={() => handleStatusChange(order._id)} className='py-3 px-5 rounded-lg bg-green-300 w-full hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 '> {loadingId == order._id ? <Loader /> : 'Mark as Completed'}</button>
                 </div>
               </div>
             ))
@@ -172,6 +184,15 @@ const Order = () => {
       )}
     </>
   );
+};
+
+const formatOrderTime = (time) => {
+  const date = new Date(time);
+  const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
+  const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+  const formattedDate = date.toLocaleDateString('en-US', optionsDate);
+  const formattedTime = date.toLocaleTimeString('en-US', optionsTime);
+  return `${formattedTime}, ${formattedDate}`;
 };
 
 export default Order;

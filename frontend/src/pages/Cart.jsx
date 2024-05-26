@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from '../components/Spinner';
@@ -8,6 +8,7 @@ import Loader from '../components/Loader';
 const Cart = () => {
     const { restaurantName, tableNumber } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
     const { cart } = location.state || { cart: {} };
     const [cartDishes, setCartDishes] = useState([]);
     const [formCart, setFormCart] = useState([]);
@@ -139,41 +140,55 @@ const Cart = () => {
         return cartDishes.reduce((total, dish) => total + (dish.price * dish.quantity), 0);
     };
 
+    const handleMenuNavigation = () => {
+        navigate(`/menu/${restaurantName}/${tableNumber}`);
+    };
+
     return (
         <>
             {pageLoading ? <Spinner /> :
                 <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
                     <ToastContainer />
-                    <h1 className='text-center text-3xl font-bold text-indigo-700 py-6 pt-3'>
+                    <div className="flex justify-between items-center">
+
+                    <h1 className='text-center text-3xl pl-4 max-md:pl-3 font-bold text-indigo-700 py-6 pt-3'>
                         {cartDishes.length ? 'Your Cart' : 'No items in the cart'}
                     </h1>
+                    <div className="flex justify-center ">
+                        <button
+                            onClick={handleMenuNavigation}
+                            className="py-2 px-6 rounded-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-transform transform hover:scale-105 duration-200 md:mr-6" >
+                            Go to Menu
+                        </button>
+                    </div>
+                    </div>
                     {cartDishes.map((dish) => (
                         <div key={dish._id} className="border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-4">
-                            <div className="flex p-4 bg-white">
-                                <img src={dish.image_url} alt={dish.name} className="w-32 h-32 object-cover rounded-md mr-4" />
-                                <div className="flex flex-col justify-between">
-                                    <div>
-                                        <h2 className="text-xl font-semibold text-gray-800">{dish.name}</h2>
-                                        <p className="text-gray-600 mt-1">{dish.description}</p>
-                                    </div>
-                                    <div className="mt-2 text-sm text-gray-500">
-                                        <p>Category: {dish.category}</p>
-                                        <p>Price: ₹{dish.price}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="flex flex-col sm:flex-row p-4 bg-white">
+                                                <img src={dish.image_url} alt={dish.name} className="w-full sm:w-32 sm:h-32 object-cover rounded-md mb-4 sm:mb-0 sm:mr-4" />
+                                                <div className="flex flex-col justify-between flex-grow">
+                                                    <div>
+                                                        <h2 className="text-lg sm:text-xl font-semibold">{dish.name}</h2>
+                                                        <p className="text-gray-500 text-sm sm:text-base mt-1">{dish.description}</p>
+                                                    </div>
+                                                    <div className="mt-2 text-sm text-gray-500">
+                                                        <p>Category: {dish.category}</p>
+                                                        <p>Price: Rs {dish.price}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                             <div className="p-4 bg-indigo-50">
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center space-x-2 max-md:justify-center">
                                     <button
                                         onClick={() => handleDecrement(dish._id)}
-                                        className="py-1 px-3 rounded-lg bg-red-400 text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors"
+                                        className="py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors"
                                     >
                                         -
                                     </button>
                                     <span className="text-lg">{dish.quantity}</span>
                                     <button
                                         onClick={() => handleIncrement(dish._id)}
-                                        className="py-1 px-3 rounded-lg bg-green-400 text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
+                                        className="py-1 px-3 rounded-lg bg-green-500 text-white hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
                                     >
                                         +
                                     </button>
@@ -219,11 +234,11 @@ const Cart = () => {
                             </button>
                         </div>
                     </form>
+                    
                 </div>
             }
         </>
     );
-    
 };
 
 export default Cart;

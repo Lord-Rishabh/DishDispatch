@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from "../components/Header";
 import { Link } from "react-router-dom";
 import Lottie from 'react-lottie';
 import food from '../lotties/food.json';
 
-
 const Homepage = () => {
+
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -21,10 +28,13 @@ const Homepage = () => {
           <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
 
             <div className="rounded-md shadow">
-              <Link to="/login" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-black hover:bg-gray-800 md:py-4 md:text-lg md:px-10">
-                Get Started
+              <Link to={token ? '/dashboard' : '/register'} >
+                <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-black hover:bg-gray-800 md:py-4 md:text-lg md:px-10 hover:scale-105 hover:transition-transform duration-200">
+                  Get Started
+                </button>
               </Link>
             </div>
+
           </div>
         </div>
         <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[470px] lg:h-[470px]">
