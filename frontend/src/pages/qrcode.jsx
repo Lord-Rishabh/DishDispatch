@@ -16,7 +16,7 @@ const QRCodeGenerator = () => {
       toast.error('Please enter a table number');
       return;
     }
-    const url = `https://dish-dispatch.vercel.app/menu/${user}/${tableNumber}`;
+    const url = `https://dishdispatch.vercel.app/menu/${user}/${tableNumber}`;
     setQRCodeUrl(url);
   };
 
